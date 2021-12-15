@@ -1,0 +1,13 @@
+{
+  "scripts": {
+    "mocha": "node_modules/mocha/bin/mocha tests",
+    "mocha-junit": "node_modules/mocha/bin/mocha --reporter node_modules/mocha-junit-reporter --reporter-options jenkinsMode=1,outputs=1,mochaFile=results/mocha-test-results.xml",
+    "mocha-junit-parallel": "circleci tests glob 'tests/**/*.js' | circleci tests split | xargs npm run mocha-junit"
+  },
+  "devDependencies": {
+    "@testmo/testmo-cli": "^1.0.0",
+    "chai": "^4.3.4",
+    "mocha": "^9.0.2",
+    "mocha-junit-reporter": "^2.0.0"
+  }
+}
