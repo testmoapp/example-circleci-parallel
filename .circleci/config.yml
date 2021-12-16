@@ -34,6 +34,15 @@ jobs:
       - attach_workspace:
           at: ~/
 
+      # Optionally add a couple of fields such as the git hash and link to the build
+      - run:
+          name: Set up resources
+          command: |
+            npx testmo automation:resources:add-field --name git --type string \
+              --value ${CIRCLE_SHA1:0:7} --resources resources.json
+            npx testmo automation:resources:add-link --name build \
+              --url $CIRCLE_BUILD_URL --resources resources.json
+
       # Create test run in Testmo and store ID in file
       - run:
           name: Create test run in Testmo
@@ -42,6 +51,7 @@ jobs:
               --instance $TESTMO_URL \
               --project-id 1 \
               --name "Parallel mocha test run" \
+              --resources resources.json \
               --source "unit-tests" > testmo-run-id.txt
 
       # Update workspace to persist run ID file
