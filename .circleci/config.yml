@@ -43,12 +43,25 @@ jobs:
             npx testmo automation:resources:add-link --name build \
               --url $CIRCLE_BUILD_URL --resources resources.json
 
+      # Check if the required variables are available
+      - run:
+          command: |
+            if [[ -z "${TESTMO_URL}" ]]; then
+              echo "The TESTMO_URL secret is not defined for this project"
+              exit 1
+            fi
+
+            if [[ -z "${TESTMO_TOKEN}" ]]; then
+              echo "The TESTMO_TOKEN secret is not defined for this project"
+              exit 1
+            fi
+
       # Create test run in Testmo and store ID in file
       - run:
           name: Create test run in Testmo
           command: |
             npx testmo automation:run:create \
-              --instance $TESTMO_URL \
+              --instance "$TESTMO_URL" \
               --project-id 1 \
               --name "Parallel mocha test run" \
               --resources resources.json \
@@ -74,8 +87,8 @@ jobs:
           name: Split and run tests
           command: |
             npx testmo automation:run:submit-thread \
-              --instance $TESTMO_URL \
-              --run-id $(cat testmo-run-id.txt) \
+              --instance "$TESTMO_URL" \
+              --run-id "$(cat testmo-run-id.txt)" \
               --results results/*.xml \
               -- npm run mocha-junit-parallel # Note space after --
 
@@ -99,8 +112,8 @@ jobs:
           name: Mark run as completed
           command: |
             npx testmo automation:run:complete \
-              --instance $TESTMO_URL \
-              --run-id $(cat testmo-run-id.txt)
+              --instance "$TESTMO_URL" \
+              --run-id "$(cat testmo-run-id.txt)"
 
   deploy:
     docker:
